@@ -121,40 +121,7 @@ navigationLinks.forEach(link => {
   });
 });
 
-document.addEventListener("DOMContentLoaded", () => {
-  const certificateImages = document.querySelectorAll(".certificate-image");
-  const modal = document.createElement("div");
 
-  // Ensure the modal is hidden by default
-  modal.classList.add("certificate-modal");
-  modal.style.display = "none";
-
-  modal.innerHTML = `
-    <div class="modal-content">
-      <span class="close-modal">&times;</span>
-      <img src="" alt="Certificate">
-    </div>
-  `;
-
-  document.body.appendChild(modal);
-
-  const modalImg = modal.querySelector("img");
-  const closeModal = modal.querySelector(".close-modal");
-
-  // Open modal when a certificate is clicked
-  certificateImages.forEach(img => {
-    img.addEventListener("click", function () {
-      modal.style.display = "flex"; // Show modal only on click
-      modalImg.src = this.src;
-    });
-  });
-
-  // Close modal events
-  closeModal.addEventListener("click", () => (modal.style.display = "none"));
-  modal.addEventListener("click", (event) => {
-    if (event.target === modal) modal.style.display = "none";
-  });
-});
 
 // Initialize filter with "all" to show all projects by default
   filterFunc("all");
@@ -198,4 +165,74 @@ document.addEventListener("DOMContentLoaded", () => {
   blogModal.addEventListener("click", (event) => {
     if (event.target === blogModal) blogModal.style.display = "none";
   });
+
+
+// Image Modal Variables
+const imageModalContainer = document.getElementById('imageModal');
+const imageModalImg = document.getElementById('modalImg');
+const imageModalCloseBtn = document.getElementById('closeModal');
+const imageModalPrevBtn = document.getElementById('prevBtn');
+const imageModalNextBtn = document.getElementById('nextBtn');
+const certificateImages = document.querySelectorAll('.certificate-image');
+
+let currentImageIndex = 0;
+const certificateImagesSrc = [];
+
+// Store all certificate image sources
+certificateImages.forEach((img, index) => {
+  certificateImagesSrc.push(img.src);
+  
+  // Add click event to open modal
+  img.addEventListener('click', () => {
+    currentImageIndex = index;
+    updateImageModal();
+    imageModalContainer.classList.add('active');
+  });
+});
+
+// Update Modal Image
+function updateImageModal() {
+  imageModalImg.src = certificateImagesSrc[currentImageIndex];
+}
+
+// Close Modal
+imageModalCloseBtn.addEventListener('click', () => {
+  imageModalContainer.classList.remove('active');
+});
+
+// Close on outside click
+imageModalContainer.addEventListener('click', (e) => {
+  if (e.target === imageModalContainer) {
+    imageModalContainer.classList.remove('active');
+  }
+});
+
+// Next Image
+imageModalNextBtn.addEventListener('click', (e) => {
+  e.stopPropagation(); // Prevent modal from closing
+  currentImageIndex = (currentImageIndex + 1) % certificateImagesSrc.length;
+  updateImageModal();
+});
+
+// Previous Image
+imageModalPrevBtn.addEventListener('click', (e) => {
+  e.stopPropagation(); // Prevent modal from closing
+  currentImageIndex = (currentImageIndex - 1 + certificateImagesSrc.length) % certificateImagesSrc.length;
+  updateImageModal();
+});
+
+// Keyboard Navigation
+document.addEventListener('keydown', (e) => {
+  if (!imageModalContainer.classList.contains('active')) return;
+  
+  if (e.key === 'Escape') {
+    imageModalContainer.classList.remove('active');
+  } else if (e.key === 'ArrowRight') {
+    currentImageIndex = (currentImageIndex + 1) % certificateImagesSrc.length;
+    updateImageModal();
+  } else if (e.key === 'ArrowLeft') {
+    currentImageIndex = (currentImageIndex - 1 + certificateImagesSrc.length) % certificateImagesSrc.length;
+    updateImageModal();
+  }
+});
 
