@@ -66,7 +66,18 @@ const filterItems = document.querySelectorAll("[data-filter-item]");
 
 const filterFunc = (selectedValue) => {
   filterItems.forEach(item => {
-    if (selectedValue === "all" || selectedValue === item.dataset.category.toLowerCase()) {
+    const categories = item.dataset.category ? item.dataset.category.toLowerCase().split(' ').map(c => c.trim()) : [];
+    const isTop = item.dataset.isTop === "true";
+
+    if (selectedValue === "all") {
+      item.classList.add("active");
+    } else if (selectedValue === "top projects") {
+      if (isTop) {
+        item.classList.add("active");
+      } else {
+        item.classList.remove("active");
+      }
+    } else if (categories.includes(selectedValue)) {
       item.classList.add("active");
     } else {
       item.classList.remove("active");
@@ -108,14 +119,22 @@ const pages = document.querySelectorAll("[data-page]");
 // Add event to all nav links
 navigationLinks.forEach(link => {
   link.addEventListener("click", function () {
+    const clickedPage = this.innerHTML.toLowerCase().trim();
+    
     pages.forEach(page => {
-      if (this.innerHTML.toLowerCase() === page.dataset.page) {
+      if (clickedPage === page.dataset.page) {
         page.classList.add("active");
-        this.classList.add("active");
         window.scrollTo(0, 0);
       } else {
         page.classList.remove("active");
-        navigationLinks.forEach(nav => nav.classList.remove("active"));
+      }
+    });
+
+    navigationLinks.forEach(nav => {
+      if (nav === this) {
+        nav.classList.add("active");
+      } else {
+        nav.classList.remove("active");
       }
     });
   });
